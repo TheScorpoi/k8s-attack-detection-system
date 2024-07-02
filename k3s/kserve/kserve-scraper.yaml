@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kserve
+  namespace: default  # The namespace where your Prometheus Operator is running
+  labels:
+    release: prometheus  # Consistent label for your Prometheus Operator
+spec:
+  endpoints:
+  - port: "9090"  # Confirm this is the correct port for metrics
+    path: "/metrics"
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+      - kserve-test  # Namespace where your KServe service is running
+  selector:
+    matchLabels:
+      serving.kserve.io/inferenceservice: "k8s-attacks-detection"  # Label to match your KServe service

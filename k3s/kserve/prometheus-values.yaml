@@ -1,0 +1,12 @@
+USER-SUPPLIED VALUES:
+
+# prometheus-values.yaml
+...
+serverFiles:
+  prometheus.yml:
+    scrape_configs:
+      - job_name: 'kserve-model'
+        static_configs:
+          - targets: ['k8s-attacks-detection.kserve-test.svc.cluster.local:8080']
+...
+

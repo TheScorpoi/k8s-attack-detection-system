@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: kubeflow-virtualservice
+  namespace: istio-system
+spec:
+  hosts:
+  - "kubeflow.k3s"
+  gateways:
+  - kubeflow-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: istio-ingressgateway
+        port:
+          number: 8080

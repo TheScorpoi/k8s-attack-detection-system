@@ -1,0 +1,1048 @@
+# PIPELINE DEFINITION
+# Name: kubernetes-attacks-detection-kubeflow-pipeline
+# Description: Kubeflow pipeline to train and deploy a model to detect Kubernetes attacks
+# Outputs:
+#    train-gbr-metric: system.ClassificationMetrics
+#    train-gbr-metrics: system.Metrics
+#    train-knn-metric: system.ClassificationMetrics
+#    train-knn-metrics: system.Metrics
+#    train-lr-metric: system.ClassificationMetrics
+#    train-lr-metrics: system.Metrics
+#    train-random-forest-metric: system.ClassificationMetrics
+#    train-random-forest-metrics: system.Metrics
+components:
+  comp-create-mlflow-experiment:
+    executorLabel: exec-create-mlflow-experiment
+    inputDefinitions:
+      parameters:
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-deploy-model-with-kserve:
+    executorLabel: exec-deploy-model-with-kserve
+    inputDefinitions:
+      parameters:
+        kserve_inference_service_name:
+          parameterType: STRING
+        model_storage_uri:
+          parameterType: STRING
+        namespace:
+          defaultValue: kserve-test
+          isOptional: true
+          parameterType: STRING
+  comp-load-data:
+    executorLabel: exec-load-data
+    outputDefinitions:
+      artifacts:
+        output_data:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-select-best-model:
+    executorLabel: exec-select-best-model
+    inputDefinitions:
+      parameters:
+        experiment_name:
+          parameterType: STRING
+        metric_name:
+          parameterType: STRING
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRUCT
+  comp-train-autoencoder:
+    executorLabel: exec-train-autoencoder
+    inputDefinitions:
+      artifacts:
+        df:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        encoded_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        encoded_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-train-gbr:
+    executorLabel: exec-train-gbr
+    inputDefinitions:
+      artifacts:
+        encoded_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        encoded_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        experiment_name:
+          parameterType: STRING
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        metric:
+          artifactType:
+            schemaTitle: system.ClassificationMetrics
+            schemaVersion: 0.0.1
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+  comp-train-knn:
+    executorLabel: exec-train-knn
+    inputDefinitions:
+      artifacts:
+        encoded_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        encoded_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        experiment_name:
+          parameterType: STRING
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        metric:
+          artifactType:
+            schemaTitle: system.ClassificationMetrics
+            schemaVersion: 0.0.1
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+  comp-train-lr:
+    executorLabel: exec-train-lr
+    inputDefinitions:
+      artifacts:
+        encoded_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        encoded_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        experiment_name:
+          parameterType: STRING
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        metric:
+          artifactType:
+            schemaTitle: system.ClassificationMetrics
+            schemaVersion: 0.0.1
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+  comp-train-random-forest:
+    executorLabel: exec-train-random-forest
+    inputDefinitions:
+      artifacts:
+        encoded_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        encoded_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_test:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+        y_train:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+      parameters:
+        experiment_name:
+          parameterType: STRING
+        mlflow_password:
+          parameterType: STRING
+        mlflow_tracking_uri:
+          parameterType: STRING
+        mlflow_user:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        metric:
+          artifactType:
+            schemaTitle: system.ClassificationMetrics
+            schemaVersion: 0.0.1
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-create-mlflow-experiment:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - create_mlflow_experiment
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'mlflow' &&\
+          \ \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef create_mlflow_experiment(mlflow_user: str, mlflow_password: str,\
+          \ mlflow_tracking_uri: str) -> str:\n    import mlflow\n    import os\n\
+          \    from datetime import datetime\n\n    os.environ['MLFLOW_TRACKING_USERNAME']\
+          \ = mlflow_user\n    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n\
+          \    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\n    client = mlflow.tracking.MlflowClient()\n\
+          \    current_time = datetime.now().strftime(\"%Y%m%d-%H%M%S\")\n    experiment_name\
+          \ = f\"kubeflow-pipeline-autoencoder-{current_time}\"\n\n    experiment_id\
+          \ = client.create_experiment(experiment_name)\n\n    print(f\"Created a\
+          \ new MLflow experiment: {experiment_name} with ID: {experiment_id}\")\n\
+          \n    return experiment_name\n\n"
+        image: python:3.8
+    exec-deploy-model-with-kserve:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - deploy_model_with_kserve
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'kserve' &&\
+          \ \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef deploy_model_with_kserve(\n    model_storage_uri: str,\n    kserve_inference_service_name:\
+          \ str,\n    namespace: str = \"kserve-test\",\n):\n    from kubernetes import\
+          \ client \n    from kserve import KServeClient\n    from kserve import constants\n\
+          \    from kserve import utils\n    from kserve import V1beta1InferenceService\n\
+          \    from kserve import V1beta1InferenceServiceSpec\n    from kserve import\
+          \ V1beta1PredictorSpec\n    from kserve import V1beta1SKLearnSpec\n\n  \
+          \  kserve_client = KServeClient()\n\n    isvc = V1beta1InferenceService(\n\
+          \        api_version=constants.KSERVE_GROUP + '/v1beta1',\n        kind=constants.KSERVE_KIND,\n\
+          \        metadata=client.V1ObjectMeta(\n            name=kserve_inference_service_name,\
+          \ \n            namespace=namespace, \n            annotations={'serving.kserve.io/enable-prometheus-scraping':\
+          \ \"true\"}\n        ),\n        spec=V1beta1InferenceServiceSpec(\n   \
+          \         predictor=V1beta1PredictorSpec(\n                sklearn=V1beta1SKLearnSpec(storage_uri=model_storage_uri)\n\
+          \            )\n        )\n    )\n\n    kserve_client.create(isvc, namespace=namespace)\n\
+          \    print(f\"InferenceService {kserve_inference_service_name} deployed\
+          \ in namespace {namespace}.\")\n\n"
+        image: python:3.9
+    exec-load-data:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - load_data
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'hopsworks'\
+          \ && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef load_data(output_data: Output[Dataset]):\n    import requests\n\
+          \    url = 'https://raw.githubusercontent.com/TheScorpoi/test/main/preprocessed_data.csv'\n\
+          \n    data = requests.get(url).content\n\n    with open(output_data.path,\
+          \ 'wb') as writer:\n        writer.write(data)\n\n    print(\"Data downloaded\
+          \ and written to:\", output_data.path)\n\n"
+        image: python:3.8
+    exec-select-best-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - select_best_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'mlflow' &&\
+          \ \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef select_best_model(\n    mlflow_user: str,\n    mlflow_password:\
+          \ str, \n    mlflow_tracking_uri: str,\n    experiment_name: str,\n    metric_name:\
+          \ str\n) -> dict:\n    import mlflow\n    import os\n\n    os.environ['MLFLOW_TRACKING_USERNAME']\
+          \ = mlflow_user\n    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n\
+          \    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\n    client = mlflow.tracking.MlflowClient()\n\
+          \n    experiment = client.get_experiment_by_name(experiment_name)\n\n  \
+          \  if not experiment:\n        raise ValueError(f\"Experiment '{experiment_name}'\
+          \ not found.\")\n\n    runs = client.search_runs([experiment.experiment_id])\n\
+          \n    best_run = None\n    best_metric = float(\"-inf\")\n\n    for run\
+          \ in runs:\n        metric_value = run.data.metrics.get(metric_name)\n\n\
+          \        if metric_value and metric_value > best_metric:\n            best_metric\
+          \ = metric_value\n            best_run = run\n    if not best_run:\n   \
+          \     raise ValueError(\"No suitable run found.\")\n\n    model_uri = f\"\
+          runs:/{best_run.info.run_id}/model\"\n    model_name=\"model1\"\n\n    #register\
+          \ best model in MLFlow model registry\n    mlflow.register_model(\n    \
+          \    model_uri,\n        name=model_name,\n    )\n\n    print(f\"Selected\
+          \ best model from run {best_run.info.run_id} with {metric_name}: {best_metric}\"\
+          )\n    return {\"model_name\": model_name, \"model_version\": \"1\", \"\
+          artifact_uri\": model_uri}\n\n"
+        image: python:3.8
+    exec-train-autoencoder:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_autoencoder
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'tensorflow-cpu'\
+          \ 'pandas' 'numpy' 'scikit-learn' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_autoencoder(\n    df: Input[Dataset],\n    encoded_train:\
+          \ Output[Dataset],\n    encoded_test: Output[Dataset],\n    y_train: Output[Dataset],\n\
+          \    y_test: Output[Dataset]\n):\n\n    import pandas as pd\n    import\
+          \ numpy as np\n    from sklearn.preprocessing import StandardScaler\n  \
+          \  from sklearn import model_selection\n    import tensorflow as tf\n  \
+          \  from tensorflow.keras.layers import Input, Dense\n    from tensorflow.keras.models\
+          \ import Model\n    from tensorflow.keras.optimizers.legacy import Adam\n\
+          \    from tensorflow.keras.initializers import glorot_normal\n\n    data\
+          \ = pd.read_csv(df.path)\n    X = data.drop('label', axis=1)\n    y = data['label']\n\
+          \n    x_train, x_test, y_train_data, y_test_data = model_selection.train_test_split(X,\
+          \ y, test_size=0.2, random_state=42)\n\n    scaler = StandardScaler()\n\
+          \    scaler.fit(x_train)\n\n    x_train_norm = scaler.transform(x_train)\n\
+          \    x_test_norm = scaler.transform(x_test)\n\n    input_dim = x_train_norm.shape[1]\n\
+          \    latent_dim = 6\n\n    tf.keras.utils.set_random_seed(42)\n\n    # Encoder\n\
+          \    input_img = Input(shape=(input_dim,))\n    encoded = Dense(10, activation='swish',\
+          \ kernel_initializer=glorot_normal())(input_img)\n    encoded = Dense(8,\
+          \ activation='swish', kernel_initializer=glorot_normal())(encoded)\n   \
+          \ encoded = Dense(latent_dim, activation='relu', kernel_initializer=glorot_normal())(encoded)\n\
+          \    encoder = Model(input_img, encoded)\n\n    # Decoder\n    decoder_input\
+          \ = Input(shape=(latent_dim,))\n    decoded_layer = Dense(8, activation='swish',\
+          \ kernel_initializer=glorot_normal())(decoder_input)\n    decoded_layer\
+          \ = Dense(10, activation='swish', kernel_initializer=glorot_normal())(decoded_layer)\n\
+          \    decoded_layer = Dense(input_dim, activation='linear', kernel_initializer=glorot_normal())(decoded_layer)\n\
+          \    decoder = Model(decoder_input, decoded_layer)\n\n    # Autoencoder\n\
+          \    autoencoder_output = decoder(encoder(input_img))\n    autoencoder =\
+          \ Model(input_img, autoencoder_output)\n    autoencoder.compile(optimizer=Adam(),\
+          \ loss='mse')\n    history = autoencoder.fit(x_train_norm, x_train_norm,\
+          \ epochs=128, batch_size=512, shuffle=True, validation_data=(x_test_norm,\
+          \ x_test_norm))\n    encoder.compile(optimizer=Adam(), loss='mse')\n   \
+          \ encoded_train_data = encoder.predict(x_train_norm)\n    encoded_test_data\
+          \ = encoder.predict(x_test_norm)\n\n    np.savetxt(encoded_train.path, encoded_train_data,\
+          \ delimiter=',')\n    np.savetxt(encoded_test.path, encoded_test_data, delimiter=',')\n\
+          \    y_train_data.to_csv(y_train.path, index=False)\n    y_test_data.to_csv(y_test.path,\
+          \ index=False)\n\n"
+        image: tensorflow/tensorflow:1.6.0
+    exec-train-gbr:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_gbr
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'scikit-learn'\
+          \ 'pandas' 'numpy' 'mlflow' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_gbr(\n    mlflow_user: str,\n    mlflow_password: str,\n\
+          \    mlflow_tracking_uri: str,\n    experiment_name: str,\n    model: Output[Model],\n\
+          \    metrics: Output[Metrics],\n    metric: Output[ClassificationMetrics],\n\
+          \    encoded_train: Input[Dataset],\n    encoded_test: Input[Dataset],\n\
+          \    y_train: Input[Dataset],\n    y_test: Input[Dataset]\n):\n\n    import\
+          \ pandas as pd\n    import numpy as np\n    import mlflow\n    import mlflow.sklearn\n\
+          \    import json\n    import os\n    from sklearn.model_selection import\
+          \ train_test_split\n    from sklearn.preprocessing import StandardScaler\n\
+          \    from sklearn.pipeline import Pipeline\n    from sklearn.ensemble import\
+          \ GradientBoostingClassifier\n    from sklearn.metrics import accuracy_score,\
+          \ confusion_matrix\n\n\n    os.environ['MLFLOW_TRACKING_USERNAME'] = mlflow_user\n\
+          \    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\
+          \n    X_train = np.loadtxt(encoded_train.path, delimiter=',')\n    X_test\
+          \ = np.loadtxt(encoded_test.path, delimiter=',')\n    y_train = pd.read_csv(y_train.path)\n\
+          \    y_test = pd.read_csv(y_test.path)\n\n    class_labels = y_test.unique().tolist()\n\
+          \n    gbr = GradientBoostingClassifier(random_state=42)\n    pipeline =\
+          \ Pipeline(steps=[('classifier', gbr)])\n\n    mlflow.set_experiment(experiment_name)\n\
+          \n    with mlflow.start_run():\n        pipeline.fit(X_train, y_train)\n\
+          \n        y_pred = pipeline.predict(X_test)\n        accuracy_value = accuracy_score(y_test,\
+          \ y_pred)\n        cm = confusion_matrix(y_test, y_pred)\n\n        metrics.log_metric('accuracy',\
+          \ accuracy_value)\n        metric.log_confusion_matrix(matrix=cm.tolist(),\
+          \ categories=class_labels)\n\n        mlflow.log_param(\"random_state\"\
+          , 42)\n        mlflow.log_metric('accuracy', accuracy_value)\n        mlflow.sklearn.log_model(pipeline,\
+          \ \"model\")\n\n        confusion_matrix_path = \"confusion_matrix.json\"\
+          \n        with open(confusion_matrix_path, 'w') as cm_file:\n          \
+          \  json.dump({'matrix': cm.tolist(), 'categories': class_labels}, cm_file)\n\
+          \n        mlflow.log_artifact(confusion_matrix_path)\n\n    model_uri =\
+          \ mlflow.get_artifact_uri(\"model\")\n    print(\"Model saved to:\", model_uri)\n\
+          \n"
+        image: python:3.8
+    exec-train-knn:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_knn
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'scikit-learn'\
+          \ 'pandas' 'numpy' 'mlflow' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_knn(\n    mlflow_user: str,\n    mlflow_password: str,\n\
+          \    mlflow_tracking_uri: str,\n    experiment_name: str,\n    model: Output[Model],\n\
+          \    metrics: Output[Metrics],\n    metric: Output[ClassificationMetrics],\n\
+          \    encoded_train: Input[Dataset],\n    encoded_test: Input[Dataset],\n\
+          \    y_train: Input[Dataset],\n    y_test: Input[Dataset]\n):\n\n    import\
+          \ pandas as pd\n    import numpy as np\n    import mlflow\n    import mlflow.sklearn\n\
+          \    import json\n    import os\n    from sklearn.model_selection import\
+          \ train_test_split\n    from sklearn.pipeline import Pipeline\n    from\
+          \ sklearn.neighbors import KNeighborsClassifier\n    from sklearn.metrics\
+          \ import accuracy_score, confusion_matrix\n\n\n    os.environ['MLFLOW_TRACKING_USERNAME']\
+          \ = mlflow_user\n    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n\
+          \    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\n    X_train = np.loadtxt(encoded_train.path,\
+          \ delimiter=',')\n    X_test = np.loadtxt(encoded_test.path, delimiter=',')\n\
+          \    y_train = pd.read_csv(y_train.path)\n    y_test = pd.read_csv(y_test.path)\n\
+          \n    class_labels = y_test.unique().tolist()\n\n    knn = KNeighborsClassifier(random_state=42)\n\
+          \    pipeline = Pipeline(steps=[('classifier', knn)])\n\n    mlflow.set_experiment(experiment_name)\n\
+          \n    with mlflow.start_run():\n        pipeline.fit(X_train, y_train)\n\
+          \n        y_pred = pipeline.predict(X_test)\n        accuracy_value = accuracy_score(y_test,\
+          \ y_pred)\n        cm = confusion_matrix(y_test, y_pred)\n\n        metrics.log_metric('accuracy',\
+          \ accuracy_value)\n        metric.log_confusion_matrix(matrix=cm.tolist(),\
+          \ categories=class_labels)\n\n        mlflow.log_param(\"random_state\"\
+          , 42)\n        mlflow.log_metric('accuracy', accuracy_value)\n        mlflow.sklearn.log_model(pipeline,\
+          \ \"model\")\n\n        confusion_matrix_path = \"confusion_matrix.json\"\
+          \n        with open(confusion_matrix_path, 'w') as cm_file:\n          \
+          \  json.dump({'matrix': cm.tolist(), 'categories': class_labels}, cm_file)\n\
+          \n        mlflow.log_artifact(confusion_matrix_path)\n\n    model_uri =\
+          \ mlflow.get_artifact_uri(\"model\")\n    print(\"Model saved to:\", model_uri)\n\
+          \n"
+        image: python:3.8
+    exec-train-lr:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_lr
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'scikit-learn'\
+          \ 'pandas' 'numpy' 'mlflow' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_lr(\n    mlflow_user: str,\n    mlflow_password: str,\n\
+          \    mlflow_tracking_uri: str,\n    experiment_name: str,\n    model: Output[Model],\n\
+          \    metrics: Output[Metrics],\n    metric: Output[ClassificationMetrics],\n\
+          \    encoded_train: Input[Dataset],\n    encoded_test: Input[Dataset],\n\
+          \    y_train: Input[Dataset],\n    y_test: Input[Dataset]\n):\n\n    import\
+          \ pandas as pd\n    import numpy as np\n    import mlflow\n    import mlflow.sklearn\n\
+          \    import json\n    import os\n    from sklearn.model_selection import\
+          \ train_test_split\n    from sklearn.pipeline import Pipeline\n    from\
+          \ sklearn.linear_model import LogisticRegression\n    from sklearn.metrics\
+          \ import accuracy_score, confusion_matrix\n\n    os.environ['MLFLOW_TRACKING_USERNAME']\
+          \ = mlflow_user\n    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n\
+          \    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\n    X_train = np.loadtxt(encoded_train.path,\
+          \ delimiter=',')\n    X_test = np.loadtxt(encoded_test.path, delimiter=',')\n\
+          \    y_train = pd.read_csv(y_train.path)\n    y_test = pd.read_csv(y_test.path)\n\
+          \n    class_labels = y_test.unique().tolist()\n\n    lr = LogisticRegression(random_state=42)\n\
+          \    pipeline = Pipeline(steps=[('classifier', lr)])\n\n    mlflow.set_experiment(experiment_name)\n\
+          \n    with mlflow.start_run():\n        pipeline.fit(X_train, y_train)\n\
+          \n        y_pred = pipeline.predict(X_test)\n        accuracy_value = accuracy_score(y_test,\
+          \ y_pred)\n        cm = confusion_matrix(y_test, y_pred)\n\n        metrics.log_metric('accuracy',\
+          \ accuracy_value)\n        metric.log_confusion_matrix(matrix=cm.tolist(),\
+          \ categories=class_labels)\n\n        mlflow.log_param(\"random_state\"\
+          , 42)\n        mlflow.log_metric('accuracy', accuracy_value)\n        mlflow.sklearn.log_model(pipeline,\
+          \ \"model\")\n\n        confusion_matrix_path = \"confusion_matrix.json\"\
+          \n        with open(confusion_matrix_path, 'w') as cm_file:\n          \
+          \  json.dump({'matrix': cm.tolist(), 'categories': class_labels}, cm_file)\n\
+          \n        mlflow.log_artifact(confusion_matrix_path)\n\n    model_uri =\
+          \ mlflow.get_artifact_uri(\"model\")\n    print(\"Model saved to:\", model_uri)\n\
+          \n"
+        image: python:3.8
+    exec-train-random-forest:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_random_forest
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.3.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'scikit-learn'\
+          \ 'pandas' 'numpy' 'mlflow' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_random_forest(\n    mlflow_user: str,\n    mlflow_password:\
+          \ str,\n    mlflow_tracking_uri: str,\n    experiment_name: str,\n    model:\
+          \ Output[Model],\n    metrics: Output[Metrics],\n    metric: Output[ClassificationMetrics],\n\
+          \    encoded_train: Input[Dataset],\n    encoded_test: Input[Dataset],\n\
+          \    y_train: Input[Dataset],\n    y_test: Input[Dataset]\n):\n\n    import\
+          \ pandas as pd\n    import numpy as np\n    import mlflow\n    import mlflow.sklearn\n\
+          \    import json\n    import os\n    from sklearn.pipeline import Pipeline\n\
+          \    from sklearn.ensemble import RandomForestClassifier\n    from sklearn.metrics\
+          \ import accuracy_score, confusion_matrix\n\n\n    os.environ['MLFLOW_TRACKING_USERNAME']\
+          \ = mlflow_user\n    os.environ['MLFLOW_TRACKING_PASSWORD'] = mlflow_password\n\
+          \    mlflow.set_tracking_uri(mlflow_tracking_uri)\n\n    X_train = np.loadtxt(encoded_train.path,\
+          \ delimiter=',')\n    X_test = np.loadtxt(encoded_test.path, delimiter=',')\n\
+          \    y_train = pd.read_csv(y_train.path)\n    y_test = pd.read_csv(y_test.path)\n\
+          \n    class_labels = y_test.unique().tolist()\n\n    rf = RandomForestClassifier(random_state=42)\n\
+          \    pipeline_rf = Pipeline(steps=[('classifier', rf)])\n\n    mlflow.set_experiment(experiment_name)\n\
+          \n    with mlflow.start_run():\n        pipeline_rf.fit(X_train, y_train)\n\
+          \n        y_pred = pipeline_rf.predict(X_test)\n        accuracy_value =\
+          \ accuracy_score(y_test, y_pred)\n        cm = confusion_matrix(y_test,\
+          \ y_pred)\n\n        metrics.log_metric('accuracy', accuracy_value)\n  \
+          \      metric.log_confusion_matrix(matrix=cm.tolist(), categories=class_labels)\n\
+          \n        mlflow.log_param(\"random_state\", 42)\n        mlflow.log_metric('accuracy',\
+          \ accuracy_value)\n        mlflow.sklearn.log_model(pipeline_rf, \"model\"\
+          )\n\n        confusion_matrix_path = \"confusion_matrix.json\"\n       \
+          \ with open(confusion_matrix_path, 'w') as cm_file:\n            json.dump({'matrix':\
+          \ cm.tolist(), 'categories': class_labels}, cm_file)\n\n        mlflow.log_artifact(confusion_matrix_path)\n\
+          \n    model_uri = mlflow.get_artifact_uri(\"model\")\n    print(\"Model\
+          \ saved to:\", model_uri)\n\n"
+        image: python:3.8
+pipelineInfo:
+  description: Kubeflow pipeline to train and deploy a model to detect Kubernetes
+    attacks
+  name: kubernetes-attacks-detection-kubeflow-pipeline
+root:
+  dag:
+    outputs:
+      artifacts:
+        train-gbr-metric:
+          artifactSelectors:
+          - outputArtifactKey: metric
+            producerSubtask: train-gbr
+        train-gbr-metrics:
+          artifactSelectors:
+          - outputArtifactKey: metrics
+            producerSubtask: train-gbr
+        train-knn-metric:
+          artifactSelectors:
+          - outputArtifactKey: metric
+            producerSubtask: train-knn
+        train-knn-metrics:
+          artifactSelectors:
+          - outputArtifactKey: metrics
+            producerSubtask: train-knn
+        train-lr-metric:
+          artifactSelectors:
+          - outputArtifactKey: metric
+            producerSubtask: train-lr
+        train-lr-metrics:
+          artifactSelectors:
+          - outputArtifactKey: metrics
+            producerSubtask: train-lr
+        train-random-forest-metric:
+          artifactSelectors:
+          - outputArtifactKey: metric
+            producerSubtask: train-random-forest
+        train-random-forest-metrics:
+          artifactSelectors:
+          - outputArtifactKey: metrics
+            producerSubtask: train-random-forest
+    tasks:
+      create-mlflow-experiment:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-create-mlflow-experiment
+        inputs:
+          parameters:
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: create-mlflow-experiment
+      deploy-model-with-kserve:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-deploy-model-with-kserve
+        dependentTasks:
+        - select-best-model
+        inputs:
+          parameters:
+            kserve_inference_service_name:
+              runtimeValue:
+                constant: k8s-attacks-detection
+            model_storage_uri:
+              runtimeValue:
+                constant: https://storage.googleapis.com/models-aveiro/model.pkl
+            namespace:
+              runtimeValue:
+                constant: kserve-test
+        taskInfo:
+          name: deploy-model-with-kserve
+      load-data:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-load-data
+        taskInfo:
+          name: load-data
+      select-best-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-select-best-model
+        dependentTasks:
+        - create-mlflow-experiment
+        - train-gbr
+        - train-knn
+        - train-lr
+        - train-random-forest
+        inputs:
+          parameters:
+            experiment_name:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-mlflow-experiment
+            metric_name:
+              runtimeValue:
+                constant: accuracy
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: select-best-model
+      train-autoencoder:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-autoencoder
+        dependentTasks:
+        - load-data
+        inputs:
+          artifacts:
+            df:
+              taskOutputArtifact:
+                outputArtifactKey: output_data
+                producerTask: load-data
+        taskInfo:
+          name: train-autoencoder
+      train-gbr:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-gbr
+        dependentTasks:
+        - create-mlflow-experiment
+        - train-autoencoder
+        inputs:
+          artifacts:
+            encoded_test:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_test
+                producerTask: train-autoencoder
+            encoded_train:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_train
+                producerTask: train-autoencoder
+            y_test:
+              taskOutputArtifact:
+                outputArtifactKey: y_test
+                producerTask: train-autoencoder
+            y_train:
+              taskOutputArtifact:
+                outputArtifactKey: y_train
+                producerTask: train-autoencoder
+          parameters:
+            experiment_name:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-mlflow-experiment
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: train-gbr
+      train-knn:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-knn
+        dependentTasks:
+        - create-mlflow-experiment
+        - train-autoencoder
+        inputs:
+          artifacts:
+            encoded_test:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_test
+                producerTask: train-autoencoder
+            encoded_train:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_train
+                producerTask: train-autoencoder
+            y_test:
+              taskOutputArtifact:
+                outputArtifactKey: y_test
+                producerTask: train-autoencoder
+            y_train:
+              taskOutputArtifact:
+                outputArtifactKey: y_train
+                producerTask: train-autoencoder
+          parameters:
+            experiment_name:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-mlflow-experiment
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: train-knn
+      train-lr:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-lr
+        dependentTasks:
+        - create-mlflow-experiment
+        - train-autoencoder
+        inputs:
+          artifacts:
+            encoded_test:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_test
+                producerTask: train-autoencoder
+            encoded_train:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_train
+                producerTask: train-autoencoder
+            y_test:
+              taskOutputArtifact:
+                outputArtifactKey: y_test
+                producerTask: train-autoencoder
+            y_train:
+              taskOutputArtifact:
+                outputArtifactKey: y_train
+                producerTask: train-autoencoder
+          parameters:
+            experiment_name:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-mlflow-experiment
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: train-lr
+      train-random-forest:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-random-forest
+        dependentTasks:
+        - create-mlflow-experiment
+        - train-autoencoder
+        inputs:
+          artifacts:
+            encoded_test:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_test
+                producerTask: train-autoencoder
+            encoded_train:
+              taskOutputArtifact:
+                outputArtifactKey: encoded_train
+                producerTask: train-autoencoder
+            y_test:
+              taskOutputArtifact:
+                outputArtifactKey: y_test
+                producerTask: train-autoencoder
+            y_train:
+              taskOutputArtifact:
+                outputArtifactKey: y_train
+                producerTask: train-autoencoder
+          parameters:
+            experiment_name:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-mlflow-experiment
+            mlflow_password:
+              runtimeValue:
+                constant: uxnsYkzVaU
+            mlflow_tracking_uri:
+              runtimeValue:
+                constant: http://mlflow-release-tracking.mlflow.svc.cluster.local
+            mlflow_user:
+              runtimeValue:
+                constant: user
+        taskInfo:
+          name: train-random-forest
+  outputDefinitions:
+    artifacts:
+      train-gbr-metric:
+        artifactType:
+          schemaTitle: system.ClassificationMetrics
+          schemaVersion: 0.0.1
+      train-gbr-metrics:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+      train-knn-metric:
+        artifactType:
+          schemaTitle: system.ClassificationMetrics
+          schemaVersion: 0.0.1
+      train-knn-metrics:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+      train-lr-metric:
+        artifactType:
+          schemaTitle: system.ClassificationMetrics
+          schemaVersion: 0.0.1
+      train-lr-metrics:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+      train-random-forest-metric:
+        artifactType:
+          schemaTitle: system.ClassificationMetrics
+          schemaVersion: 0.0.1
+      train-random-forest-metrics:
+        artifactType:
+          schemaTitle: system.Metrics
+          schemaVersion: 0.0.1
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.3.0

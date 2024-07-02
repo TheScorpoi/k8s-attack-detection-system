@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: python-app-monitor
+  namespace: kserve-test
+spec:
+  selector:
+    matchLabels:
+      app: python-app  
+  endpoints:
+  - port: "3344"
+    interval: 5s

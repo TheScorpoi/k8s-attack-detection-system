@@ -1,0 +1,9 @@
+apiVersion: "serving.kserve.io/v1beta1"
+kind: "InferenceService"
+metadata:
+  name: "aas-k8s-attack-model-deploy-test-kubeflow-endpoints"
+  namespace: kubeflow-user-example-com
+spec:
+  predictor:
+    sklearn:
+      storageUri: "https://storage.googleapis.com/models-aveiro/model.pkl"
