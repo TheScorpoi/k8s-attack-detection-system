@@ -8,6 +8,7 @@
 
 - To develop the MLOps system, the Kubeflow framwork was used to create a pipeline that trains a model to detect attacks on a Kubernetes system. The pipeline is deployed on a Kubernetes cluster and is defined through the kubeflow pipeline SDK in Python.
 
+NOTE: the original repo is in deti-uaveiro organizaiton ([here](https://github.com/detiuaveiro/aas-project-kubernetes-attacks-detection-98491)), but I am not able to make it public, so I copied the repo to my personal account.
 
 ## Architecture
 
